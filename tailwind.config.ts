@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				gaming: {
+					'blue': '#0A1128',
+					'purple': '#5E17EB',
+					'purple-light': '#8F6AFA',
+					'cyan': '#03DAC6',
+					'red': '#FF4655',
+					'dark': '#121212',
+					'card': '#1A1A2E',
+					'card-hover': '#242442'
 				}
 			},
 			borderRadius: {
@@ -84,11 +95,24 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-glow': {
+					'0%, 100%': { 
+						boxShadow: '0 0 2px rgba(94, 23, 235, 0.2), 0 0 6px rgba(94, 23, 235, 0.2)'
+					},
+					'50%': { 
+						boxShadow: '0 0 8px rgba(94, 23, 235, 0.6), 0 0 16px rgba(94, 23, 235, 0.4)'
+					},
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
+			},
+			backgroundImage: {
+				'gaming-gradient': 'linear-gradient(to right, #5E17EB, #8F6AFA)',
+				'gaming-dark': 'radial-gradient(circle at center, #1A1A2E, #0A1128)'
 			}
 		}
 	},
