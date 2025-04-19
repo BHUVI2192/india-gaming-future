@@ -1,7 +1,7 @@
 
 import { Product } from "@/data/mockProducts";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart, Star, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -12,6 +12,10 @@ export function ProductCard({ product }: ProductCardProps) {
   const discount = product.discountedPrice 
     ? Math.round(((product.price - product.discountedPrice) / product.price) * 100) 
     : 0;
+
+  const handleBuy = () => {
+    window.open(product.externalUrl, '_blank');
+  };
 
   return (
     <div className="bg-gaming-card rounded-lg overflow-hidden border border-muted hover:shadow-md transition-shadow">
@@ -28,6 +32,9 @@ export function ProductCard({ product }: ProductCardProps) {
             -{discount}%
           </div>
         )}
+        <div className={`absolute top-2 left-2 px-2 py-1 rounded-md text-white text-xs font-bold ${product.source === 'Amazon' ? 'bg-[#FF9900]' : 'bg-[#2874f0]'}`}>
+          {product.source}
+        </div>
         {!product.inStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
             <div className="bg-gaming-dark px-3 py-1 rounded-md text-white font-medium">
@@ -56,11 +63,13 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
         <Button 
-          className="w-full gaming-button flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2"
+          variant="outline"
+          onClick={handleBuy}
           disabled={!product.inStock}
         >
-          <ShoppingCart className="w-4 h-4" />
-          <span>Add to Cart</span>
+          <ExternalLink className="w-4 h-4" />
+          <span>Buy on {product.source}</span>
         </Button>
       </div>
     </div>

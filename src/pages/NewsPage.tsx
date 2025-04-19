@@ -4,10 +4,48 @@ import { NewsCard } from "@/components/news/NewsCard";
 import { mockNews } from "@/data/mockNews";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { fetchExternalNews } from "@/services/newsService";
+import { toast } from "sonner";
 
 const NewsPage = () => {
+  const [news, setNews] = useState(mockNews);
+  const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  const fetchNews = async () => {
+    setLoading(true);
+    try {
+      const externalNews = await fetchExternalNews();
+      if (externalNews.length > 0) {
+        // Combine with some existing news but prioritize external news
+        const combinedNews = [...externalNews, ...mockNews.slice(0, mockNews.length - externalNews.length)];
+        setNews(combinedNews);
+        setLastUpdated(new Date());
+        toast.success("News updated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to fetch news:", error);
+      toast.error("Failed to fetch the latest news");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch news on initial load
+    fetchNews();
+
+    // Set up hourly updates
+    const interval = setInterval(() => {
+      fetchNews();
+    }, 60 * 60 * 1000); // 1 hour in milliseconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div>
       <PageHeader 
@@ -24,6 +62,22 @@ const NewsPage = () => {
         }
       />
       
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-sm text-muted-foreground">
+          Last updated: {lastUpdated.toLocaleTimeString()} {lastUpdated.toLocaleDateString()}
+        </p>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={fetchNews} 
+          disabled={loading} 
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          {loading ? "Updating..." : "Refresh News"}
+        </Button>
+      </div>
+      
       <Tabs defaultValue="all" className="mb-8">
         <TabsList>
           <TabsTrigger value="all">All News</TabsTrigger>
@@ -33,37 +87,37 @@ const NewsPage = () => {
         </TabsList>
         <TabsContent value="all" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockNews.map((news) => (
-              <NewsCard key={news.id} news={news} />
+            {news.map((newsItem) => (
+              <NewsCard key={newsItem.id} news={newsItem} />
             ))}
           </div>
         </TabsContent>
         <TabsContent value="esports" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockNews
-              .filter(news => news.category === "esports")
-              .map((news) => (
-                <NewsCard key={news.id} news={news} />
+            {news
+              .filter(newsItem => newsItem.category === "esports")
+              .map((newsItem) => (
+                <NewsCard key={newsItem.id} news={newsItem} />
               ))
             }
           </div>
         </TabsContent>
         <TabsContent value="gaming" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockNews
-              .filter(news => news.category === "gaming")
-              .map((news) => (
-                <NewsCard key={news.id} news={news} />
+            {news
+              .filter(newsItem => newsItem.category === "gaming")
+              .map((newsItem) => (
+                <NewsCard key={newsItem.id} news={newsItem} />
               ))
             }
           </div>
         </TabsContent>
         <TabsContent value="tournaments" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockNews
-              .filter(news => news.category === "tournaments")
-              .map((news) => (
-                <NewsCard key={news.id} news={news} />
+            {news
+              .filter(newsItem => newsItem.category === "tournaments")
+              .map((newsItem) => (
+                <NewsCard key={newsItem.id} news={newsItem} />
               ))
             }
           </div>

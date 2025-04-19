@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NewsPage from "./pages/NewsPage";
 import TournamentsPage from "./pages/TournamentsPage";
-import VideosPage from "./pages/VideosPage";
+import StreamPage from "./pages/StreamPage";
 import ShopPage from "./pages/ShopPage";
 import ChatPage from "./pages/ChatPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -28,7 +28,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/tournaments" element={<TournamentsPage />} />
-            <Route path="/videos" element={<VideosPage />} />
+            <Route path="/videos" element={<StreamPage />} />
+            <Route path="/stream" element={<StreamPage />} />
             <Route path="/shop" element={<ShopPage />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/profile" element={<ProfilePage />} />

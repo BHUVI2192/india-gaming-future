@@ -2,8 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Newspaper, Trophy, Video, ShoppingCart, MessagesSquare } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Index = () => {
+  const [aboutOpen, setAboutOpen] = useState(false);
+
   return (
     <div className="flex flex-col gap-12">
       {/* Hero Section */}
@@ -18,13 +22,34 @@ const Index = () => {
                 Your trusted platform for verified esports news, tournaments, videos, and gaming accessories.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="gaming-button">Get Started</Button>
-                <Button variant="outline" size="lg">Learn More</Button>
+                <Button variant="outline" size="lg" onClick={() => setAboutOpen(true)}>About Bharat Esports</Button>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* About Dialog */}
+      <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">About Bharat Esports</DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-base space-y-4">
+            <p>
+              Bharat Esports is one of India's leading esports organizations, dedicated to nurturing raw talent 
+              and transforming passionate gamers into true champions. Built on the belief that every underdog 
+              deserves a chance to shine, Bharat Esports provides a platform where dreams meet dedication, 
+              and potential turns into success.
+            </p>
+            <p>
+              With a strong vision for the future of gaming in India, we are committed to creating opportunities, 
+              building communities, and setting new benchmarks in the world of esports. At Bharat Esports, 
+              we don't just play the game — we redefine it.
+            </p>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
 
       {/* Features Section */}
       <section>
@@ -76,12 +101,12 @@ const Index = () => {
               <div className="w-12 h-12 rounded-lg bg-gaming-purple/10 flex items-center justify-center mb-4">
                 <Video className="w-6 h-6 text-gaming-purple" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Gaming Videos</h3>
+              <h3 className="text-xl font-bold mb-2">Streaming</h3>
               <p className="text-muted-foreground mb-4">
                 Upload, watch, and stream gameplay videos with zero commission donations.
               </p>
               <div className="flex items-center text-gaming-purple">
-                <span>Watch Videos</span>
+                <span>Watch Streams</span>
                 <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
               </div>
             </div>
@@ -158,7 +183,6 @@ const Index = () => {
         <p className="mb-8 max-w-2xl mx-auto">
           Be part of the movement that's building the future of gaming in India. Access verified news, tournaments, and connect with like-minded gamers.
         </p>
-        <Button size="lg" variant="outline" className="bg-white text-gaming-purple hover:bg-white/90">Get Started Now</Button>
       </section>
     </div>
   );
