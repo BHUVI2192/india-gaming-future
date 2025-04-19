@@ -14,31 +14,40 @@ import ProfilePage from "./pages/ProfilePage";
 import SearchPage from "./pages/SearchPage";
 import NotFound from "./pages/NotFound";
 import { AppLayout } from "./components/layout/AppLayout";
+import LoginPage from "./pages/auth/LoginPage";
+import SignupPage from "./pages/auth/SignupPage";
+import { AuthProvider } from "./context/AuthContext";
+import AboutDialog from "./components/about/AboutDialog";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/news" element={<NewsPage />} />
-            <Route path="/tournaments" element={<TournamentsPage />} />
-            <Route path="/videos" element={<StreamPage />} />
-            <Route path="/stream" element={<StreamPage />} />
-            <Route path="/shop" element={<ShopPage />} />
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/search" element={<SearchPage />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AboutDialog />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/news" element={<NewsPage />} />
+              <Route path="/tournaments" element={<TournamentsPage />} />
+              <Route path="/videos" element={<StreamPage />} />
+              <Route path="/stream" element={<StreamPage />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/search" element={<SearchPage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

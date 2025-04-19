@@ -1,4 +1,3 @@
-
 import { PageHeader } from "@/components/common/PageHeader";
 import { NewsCard } from "@/components/news/NewsCard";
 import { mockNews } from "@/data/mockNews";
@@ -7,25 +6,36 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RefreshCw, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { fetchExternalNews } from "@/services/newsService";
+import { fetchExternalNews, getNewsFromDatabase } from "@/services/newsService";
 import { toast } from "sonner";
+import { NewsItem } from "@/data/mockNews";
+import { useAuth } from "@/context/AuthContext";
+import { Link } from "react-router-dom";
 
 const NewsPage = () => {
-  const [news, setNews] = useState(mockNews);
+  const [news, setNews] = useState<NewsItem[]>(mockNews);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const { isAuthenticated } = useAuth();
 
   const fetchNews = async () => {
     setLoading(true);
     try {
-      const externalNews = await fetchExternalNews();
-      if (externalNews.length > 0) {
-        // Combine with some existing news but prioritize external news
-        const combinedNews = [...externalNews, ...mockNews.slice(0, mockNews.length - externalNews.length)];
-        setNews(combinedNews);
-        setLastUpdated(new Date());
-        toast.success("News updated successfully!");
+      const dbNews = await getNewsFromDatabase();
+      
+      if (dbNews.length > 0) {
+        setNews(dbNews);
+      } else {
+        const externalNews = await fetchExternalNews();
+        if (externalNews.length > 0) {
+          const combinedNews = [...externalNews, ...mockNews.slice(0, mockNews.length - externalNews.length)];
+          setNews(combinedNews);
+        }
       }
+      
+      setLastUpdated(new Date());
+      toast.success("News updated successfully!");
     } catch (error) {
       console.error("Failed to fetch news:", error);
       toast.error("Failed to fetch the latest news");
@@ -35,16 +45,28 @@ const NewsPage = () => {
   };
 
   useEffect(() => {
-    // Fetch news on initial load
     fetchNews();
 
-    // Set up hourly updates
     const interval = setInterval(() => {
       fetchNews();
-    }, 60 * 60 * 1000); // 1 hour in milliseconds
+    }, 30 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      const filteredNews = news.filter(item => 
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setNews(filteredNews);
+      toast.info(`Found ${filteredNews.length} results for "${searchQuery}"`);
+    } else {
+      fetchNews();
+    }
+  };
 
   return (
     <div>
@@ -53,11 +75,22 @@ const NewsPage = () => {
         description="Stay updated with verified news from the gaming world"
         action={
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input 
-              placeholder="Search news..." 
-              className="pl-10 bg-gaming-card border-muted w-full md:w-64"
-            />
+            <form onSubmit={handleSearch}>
+              <div className="flex items-center">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                  <Input 
+                    placeholder="Search news..." 
+                    className="pl-10 bg-gaming-card border-muted w-full md:w-64"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <Button type="submit" variant="ghost" size="sm" className="ml-2">
+                  Search
+                </Button>
+              </div>
+            </form>
           </div>
         }
       />
@@ -77,6 +110,17 @@ const NewsPage = () => {
           {loading ? "Updating..." : "Refresh News"}
         </Button>
       </div>
+      
+      {!isAuthenticated && (
+        <div className="mb-6 p-4 bg-gaming-card rounded-lg border border-gaming-purple/30">
+          <p className="text-sm flex justify-between items-center">
+            <span>Sign in to save articles and get personalized news recommendations.</span>
+            <Link to="/login">
+              <Button size="sm" variant="outline">Sign In</Button>
+            </Link>
+          </p>
+        </div>
+      )}
       
       <Tabs defaultValue="all" className="mb-8">
         <TabsList>
