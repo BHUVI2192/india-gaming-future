@@ -1,10 +1,8 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { 
   Newspaper, 
   Search, 
   Trophy, 
-  Video, 
   ShoppingCart, 
   MessagesSquare, 
   User,
@@ -30,11 +28,6 @@ const navItems = [
     name: "Tournaments", 
     icon: Trophy, 
     path: "/tournaments" 
-  },
-  { 
-    name: "Stream", 
-    icon: Video, 
-    path: "/stream" 
   },
   { 
     name: "Shop", 
