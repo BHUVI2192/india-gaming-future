@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import OrganizeTournamentForm from "@/components/tournaments/OrganizeTournamentForm";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 

@@ -1,7 +1,6 @@
-
 import { NewsItem } from "@/data/mockNews";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 // This would be the actual URL of the news source in production
 const NEWS_API_URL = "https://api.example.com/esports-news";
