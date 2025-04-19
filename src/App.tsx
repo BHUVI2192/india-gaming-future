@@ -27,8 +27,8 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <AboutDialog />
         <BrowserRouter>
+          <AboutDialog />
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
