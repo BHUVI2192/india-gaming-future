@@ -1,3 +1,4 @@
+
 import { NewsItem } from "@/data/mockNews";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,11 +51,11 @@ export async function storeNewsInDatabase(news: NewsItem) {
     const { error } = await supabase.from('news').insert({
       title: news.title,
       description: news.description,
-      imageUrl: news.imageUrl,
+      imageurl: news.imageUrl, // Map to database column name
       source: news.source,
       date: news.date,
       category: news.category,
-      isVerified: news.isVerified
+      isverified: news.isVerified // Map to database column name
     });
     
     if (error) throw error;
@@ -74,7 +75,20 @@ export async function getNewsFromDatabase(): Promise<NewsItem[]> {
       .order('date', { ascending: false });
     
     if (error) throw error;
-    return data || [];
+    
+    // Map database columns to NewsItem interface properties
+    const formattedNews: NewsItem[] = data?.map(item => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      imageUrl: item.imageurl, // Map from database column name
+      source: item.source,
+      date: item.date,
+      category: item.category,
+      isVerified: item.isverified // Map from database column name
+    })) || [];
+    
+    return formattedNews;
   } catch (error) {
     console.error("Error fetching news from database:", error);
     return [];
@@ -91,7 +105,20 @@ export async function searchNewsByGame(gameName: string): Promise<NewsItem[]> {
       .order('date', { ascending: false });
     
     if (error) throw error;
-    return data || [];
+    
+    // Map database columns to NewsItem interface properties
+    const formattedNews: NewsItem[] = data?.map(item => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      imageUrl: item.imageurl, // Map from database column name
+      source: item.source,
+      date: item.date,
+      category: item.category,
+      isVerified: item.isverified // Map from database column name
+    })) || [];
+    
+    return formattedNews;
   } catch (error) {
     console.error("Error searching news:", error);
     return [];
