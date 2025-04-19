@@ -1,6 +1,5 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
@@ -20,17 +19,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if Supabase is properly initialized
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-      console.warn("Supabase configuration is missing. Please check your environment variables.");
-      setInitError("Supabase configuration is missing. Please check your environment variables.");
-      setLoading(false);
-      return;
-    }
-
     // Get initial session
     const getInitialSession = async () => {
       try {
@@ -38,14 +28,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (error) {
           console.error("Error getting session:", error);
-          setInitError("Authentication service unavailable. Please try again later.");
+          toast.error("Authentication service unavailable. Please try again later.");
         } else {
           setSession(data.session);
           setUser(data.session?.user ?? null);
         }
       } catch (e) {
         console.error("Exception in auth initialization:", e);
-        setInitError("Failed to initialize authentication.");
+        toast.error("Failed to initialize authentication.");
       } finally {
         setLoading(false);
       }
@@ -66,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return () => subscription.unsubscribe();
     } catch (e) {
       console.error("Exception setting up auth listener:", e);
-      setInitError("Failed to initialize authentication listener.");
+      toast.error("Failed to initialize authentication listener.");
       setLoading(false);
       return () => {}; // Empty cleanup function
     }
@@ -142,12 +132,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
     isAuthenticated: !!session
   };
-
-  // Show error if initialization failed
-  if (initError && !loading) {
-    console.error("Auth initialization error:", initError);
-    toast.error(initError);
-  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
