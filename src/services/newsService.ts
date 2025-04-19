@@ -2,23 +2,9 @@ import { NewsItem } from "@/data/mockNews";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-// This would be the actual URL of the news source in production
-const NEWS_API_URL = "https://api.example.com/esports-news";
-
-// For newsAPI or custom scraping solution in the future
-// In production, this would be replaced with an actual API call or server-side function
 export async function fetchExternalNews(): Promise<NewsItem[]> {
   try {
     console.log("Fetching fresh news...");
-    
-    // In a real implementation, we would use Supabase Edge Functions to scrape indiatodaygaming.com
-    // For now, we'll use simulated data
-    
-    // This would be a Supabase Edge Function in production
-    // const { data, error } = await supabase.functions.invoke('fetch-gaming-news');
-    // if (error) throw error;
-    
-    // Instead, we'll simulate the response
     return [
       {
         id: "external-1",
@@ -61,9 +47,15 @@ export async function fetchExternalNews(): Promise<NewsItem[]> {
 // Store news in Supabase
 export async function storeNewsInDatabase(news: NewsItem) {
   try {
-    const { error } = await supabase
-      .from('news')
-      .insert([news]);
+    const { error } = await supabase.from('news').insert({
+      title: news.title,
+      description: news.description,
+      imageUrl: news.imageUrl,
+      source: news.source,
+      date: news.date,
+      category: news.category,
+      isVerified: news.isVerified
+    });
     
     if (error) throw error;
     return true;

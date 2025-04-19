@@ -9,7 +9,78 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      news: {
+        Row: {
+          category: string
+          date: string
+          description: string
+          id: string
+          imageurl: string
+          isverified: boolean
+          source: string
+          title: string
+        }
+        Insert: {
+          category: string
+          date?: string
+          description: string
+          id?: string
+          imageurl?: string
+          isverified?: boolean
+          source: string
+          title: string
+        }
+        Update: {
+          category?: string
+          date?: string
+          description?: string
+          id?: string
+          imageurl?: string
+          isverified?: boolean
+          source?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      tournaments: {
+        Row: {
+          created_at: string
+          description: string
+          game_name: string
+          id: string
+          organizer_id: string | null
+          prize_pool: string
+          registration_link: string
+          start_date: string
+          thumbnail_url: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          game_name: string
+          id?: string
+          organizer_id?: string | null
+          prize_pool: string
+          registration_link: string
+          start_date: string
+          thumbnail_url?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          game_name?: string
+          id?: string
+          organizer_id?: string | null
+          prize_pool?: string
+          registration_link?: string
+          start_date?: string
+          thumbnail_url?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

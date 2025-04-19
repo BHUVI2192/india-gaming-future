@@ -1,4 +1,3 @@
-
 import { PageHeader } from "@/components/common/PageHeader";
 import { OrganizerCard } from "@/components/tournaments/OrganizerCard";
 import { mockTournamentOrganizers } from "@/data/mockTournaments";
@@ -42,18 +41,19 @@ const TournamentsPage = () => {
         
         if (error) throw error;
         
-        if (data && data.length > 0) {
+        if (data) {
           setTournaments(data);
         }
       } catch (error) {
         console.error("Error fetching tournaments:", error);
+        toast.error("Failed to fetch tournaments");
       } finally {
         setLoading(false);
       }
     };
     
     fetchTournaments();
-  }, [organizeDialogOpen]); // Refetch when the dialog closes (new tournament might be added)
+  }, [organizeDialogOpen]);
 
   const handleOrganizeClick = () => {
     if (!isAuthenticated) {

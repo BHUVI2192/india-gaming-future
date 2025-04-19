@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,7 +13,6 @@ import { toast } from "sonner";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
 
-// Form schema
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   gameName: z.string().min(2, "Game name is required"),
@@ -61,19 +59,17 @@ export default function OrganizeTournamentForm({ open, setOpen }: { open: boolea
     try {
       let thumbnailUrl = "/placeholder.svg";
       
-      // Upload thumbnail if provided
       if (thumbnail) {
         const fileExt = thumbnail.name.split('.').pop();
         const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
         const filePath = `tournaments/${fileName}`;
         
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('tournament-thumbnails')
           .upload(filePath, thumbnail);
           
         if (uploadError) throw uploadError;
         
-        // Get public URL
         const { data: { publicUrl } } = supabase.storage
           .from('tournament-thumbnails')
           .getPublicUrl(filePath);
@@ -81,21 +77,16 @@ export default function OrganizeTournamentForm({ open, setOpen }: { open: boolea
         thumbnailUrl = publicUrl;
       }
       
-      // Store tournament data in the database
-      const { error } = await supabase
-        .from('tournaments')
-        .insert([
-          {
-            title: values.title,
-            game_name: values.gameName,
-            prize_pool: values.prizePool,
-            registration_link: values.registrationLink,
-            start_date: values.startDate,
-            description: values.description,
-            thumbnail_url: thumbnailUrl,
-            organizer_id: user?.id,
-          },
-        ]);
+      const { error } = await supabase.from('tournaments').insert({
+        title: values.title,
+        game_name: values.gameName,
+        prize_pool: values.prizePool,
+        registration_link: values.registrationLink,
+        start_date: values.startDate,
+        description: values.description,
+        thumbnail_url: thumbnailUrl,
+        organizer_id: user?.id,
+      });
         
       if (error) throw error;
       
