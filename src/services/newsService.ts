@@ -84,7 +84,7 @@ export async function getNewsFromDatabase(): Promise<NewsItem[]> {
       imageUrl: item.imageurl, // Map from database column name
       source: item.source,
       date: item.date,
-      category: item.category,
+      category: validateCategory(item.category), // Validate and ensure type safety
       isVerified: item.isverified // Map from database column name
     })) || [];
     
@@ -114,7 +114,7 @@ export async function searchNewsByGame(gameName: string): Promise<NewsItem[]> {
       imageUrl: item.imageurl, // Map from database column name
       source: item.source,
       date: item.date,
-      category: item.category,
+      category: validateCategory(item.category), // Validate and ensure type safety
       isVerified: item.isverified // Map from database column name
     })) || [];
     
@@ -123,4 +123,14 @@ export async function searchNewsByGame(gameName: string): Promise<NewsItem[]> {
     console.error("Error searching news:", error);
     return [];
   }
+}
+
+// Helper function to validate category
+function validateCategory(category: string): "esports" | "gaming" | "tournaments" {
+  if (category === "esports" || category === "gaming" || category === "tournaments") {
+    return category;
+  }
+  // Default to "gaming" if an invalid category is received
+  console.warn(`Invalid news category received: ${category}. Defaulting to "gaming".`);
+  return "gaming";
 }
