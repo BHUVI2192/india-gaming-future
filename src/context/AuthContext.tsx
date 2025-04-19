@@ -20,25 +20,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    // Check if Supabase is properly initialized
+    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+      setInitError("Supabase configuration is missing. Please check your environment variables.");
       setLoading(false);
-    });
+      return;
+    }
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    // Get initial session
+    const getInitialSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error getting session:", error);
+          setInitError("Authentication service unavailable. Please try again later.");
+        } else {
+          setSession(data.session);
+          setUser(data.session?.user ?? null);
+        }
+      } catch (e) {
+        console.error("Exception in auth initialization:", e);
+        setInitError("Failed to initialize authentication.");
+      } finally {
         setLoading(false);
       }
-    );
+    };
 
-    return () => subscription.unsubscribe();
+    getInitialSession();
+
+    // Listen for auth changes
+    try {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (_event, session) => {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      );
+
+      return () => subscription.unsubscribe();
+    } catch (e) {
+      console.error("Exception setting up auth listener:", e);
+      setInitError("Failed to initialize authentication listener.");
+      setLoading(false);
+      return () => {}; // Empty cleanup function
+    }
   }, []);
 
   // Sign up function
@@ -111,6 +141,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
     isAuthenticated: !!session
   };
+
+  // Show error if initialization failed
+  if (initError && !loading) {
+    toast.error(initError);
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
