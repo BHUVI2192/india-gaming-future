@@ -33,12 +33,12 @@ export default function SignupPage() {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
+      setIsSubmitting(true);
       await signUp(email, password, username);
       navigate("/login");
     } catch (err: any) {
+      console.error("Signup error:", err);
       setError(err.message || "Failed to sign up. Please try again.");
     } finally {
       setIsSubmitting(false);

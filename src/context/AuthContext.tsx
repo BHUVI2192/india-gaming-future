@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check if Supabase is properly initialized
     if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+      console.warn("Supabase configuration is missing. Please check your environment variables.");
       setInitError("Supabase configuration is missing. Please check your environment variables.");
       setLoading(false);
       return;
@@ -144,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Show error if initialization failed
   if (initError && !loading) {
+    console.error("Auth initialization error:", initError);
     toast.error(initError);
   }
 
