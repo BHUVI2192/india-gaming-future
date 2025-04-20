@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
-export function CreateNewsForm() {
+interface CreateNewsFormProps {
+  onSuccess?: () => void;
+}
+
+export function CreateNewsForm({ onSuccess }: CreateNewsFormProps) {
   const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -41,6 +44,7 @@ export function CreateNewsForm() {
       setDescription("");
       setImageUrl("");
       setSource("");
+      onSuccess?.();
     } catch (error) {
       console.error("Error creating news:", error);
       toast.error("Failed to create news article");

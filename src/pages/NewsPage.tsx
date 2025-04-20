@@ -2,42 +2,33 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { NewsCard } from "@/components/news/NewsCard";
 import { CreateNewsForm } from "@/components/news/CreateNewsForm";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { mockNews } from "@/data/mockNews";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { fetchExternalNews, getNewsFromDatabase } from "@/services/newsService";
+import { getNewsFromDatabase } from "@/services/newsService";
 import { toast } from "sonner";
 import { NewsItem } from "@/data/mockNews";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 const NewsPage = () => {
-  const [news, setNews] = useState<NewsItem[]>(mockNews);
+  const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const { isAuthenticated } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const fetchNews = async () => {
     setLoading(true);
     try {
       const dbNews = await getNewsFromDatabase();
-      
       if (dbNews.length > 0) {
         setNews(dbNews);
-      } else {
-        const externalNews = await fetchExternalNews();
-        if (externalNews.length > 0) {
-          const combinedNews = [...externalNews, ...mockNews.slice(0, mockNews.length - externalNews.length)];
-          setNews(combinedNews);
-        }
       }
-      
-      setLastUpdated(new Date());
       toast.success("News updated successfully!");
     } catch (error) {
       console.error("Failed to fetch news:", error);
@@ -49,12 +40,6 @@ const NewsPage = () => {
 
   useEffect(() => {
     fetchNews();
-
-    const interval = setInterval(() => {
-      fetchNews();
-    }, 30 * 60 * 1000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -77,49 +62,44 @@ const NewsPage = () => {
         title="Esports & Gaming News"
         description="Stay updated with verified news from the gaming world"
         action={
-          <div className="relative">
-            <form onSubmit={handleSearch}>
-              <div className="flex items-center">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                  <Input 
-                    placeholder="Search news..." 
-                    className="pl-10 bg-gaming-card border-muted w-full md:w-64"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <form onSubmit={handleSearch}>
+                <div className="flex items-center">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                    <Input 
+                      placeholder="Search news..." 
+                      className="pl-10 bg-gaming-card border-muted w-full md:w-64"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" variant="ghost" size="sm" className="ml-2">
+                    Search
+                  </Button>
                 </div>
-                <Button type="submit" variant="ghost" size="sm" className="ml-2">
-                  Search
-                </Button>
-              </div>
-            </form>
+              </form>
+            </div>
+            {isAdmin && (
+              <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add News
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <CreateNewsForm onSuccess={() => {
+                    setShowCreateForm(false);
+                    fetchNews();
+                  }} />
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         }
       />
-
-      {isAdmin && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Create News Article</h2>
-          <CreateNewsForm />
-        </div>
-      )}
-      
-      <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-muted-foreground">
-          Last updated: {lastUpdated.toLocaleTimeString()} {lastUpdated.toLocaleDateString()}
-        </p>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={fetchNews} 
-          disabled={loading} 
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          {loading ? "Updating..." : "Refresh News"}
-        </Button>
-      </div>
       
       {!isAuthenticated && (
         <div className="mb-6 p-4 bg-gaming-card rounded-lg border border-gaming-purple/30">
@@ -177,10 +157,6 @@ const NewsPage = () => {
           </div>
         </TabsContent>
       </Tabs>
-
-      <div className="flex justify-center mt-8">
-        <Button variant="outline">Load More News</Button>
-      </div>
     </div>
   );
 };
