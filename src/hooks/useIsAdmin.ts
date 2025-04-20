@@ -11,14 +11,16 @@ export function useIsAdmin() {
     queryFn: async () => {
       if (!user) return false;
       
+      type HasRoleParams = {
+        user_id: string;
+        role: string;
+      };
+      
       const { data, error } = await supabase
         .rpc('has_role', {
           user_id: user.id,
           role: 'admin'
-        } as {
-          user_id: string;
-          role: string;
-        });
+        } as HasRoleParams);
 
       if (error) {
         console.error("Error checking admin status:", error);
