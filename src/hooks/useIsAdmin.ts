@@ -16,11 +16,12 @@ export function useIsAdmin() {
         role: string;
       };
       
+      // Define the return type explicitly for the RPC function
       const { data, error } = await supabase
-        .rpc('has_role', {
+        .rpc<boolean>('has_role', {
           user_id: user.id,
           role: 'admin'
-        } as HasRoleParams);
+        });
 
       if (error) {
         console.error("Error checking admin status:", error);
