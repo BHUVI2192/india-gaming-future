@@ -11,20 +11,20 @@ export function useIsAdmin() {
     queryFn: async () => {
       if (!user) return false;
       
-      // Call the RPC function without specifying explicit generic type parameters
-      // This allows TypeScript to infer the types based on the arguments
+      // Check if user has admin role
       const { data, error } = await supabase
-        .rpc('has_role', {
-          user_id: user.id,
-          role: 'admin'
-        });
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
 
       if (error) {
         console.error("Error checking admin status:", error);
         return false;
       }
 
-      return data || false;
+      return !!data;
     },
     enabled: !!user,
   });
