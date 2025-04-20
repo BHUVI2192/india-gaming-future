@@ -1,5 +1,7 @@
 import { PageHeader } from "@/components/common/PageHeader";
 import { NewsCard } from "@/components/news/NewsCard";
+import { CreateNewsForm } from "@/components/news/CreateNewsForm";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { mockNews } from "@/data/mockNews";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,6 +20,7 @@ const NewsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const { isAuthenticated } = useAuth();
+  const { isAdmin } = useIsAdmin();
 
   const fetchNews = async () => {
     setLoading(true);
@@ -94,6 +97,13 @@ const NewsPage = () => {
           </div>
         }
       />
+
+      {isAdmin && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4">Create News Article</h2>
+          <CreateNewsForm />
+        </div>
+      )}
       
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-muted-foreground">
