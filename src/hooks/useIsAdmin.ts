@@ -15,6 +15,9 @@ export function useIsAdmin() {
         .rpc('has_role', {
           user_id: user.id,
           role: 'admin'
+        } as {
+          user_id: string;
+          role: string;
         });
 
       if (error) {
