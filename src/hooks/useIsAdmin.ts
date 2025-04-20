@@ -16,9 +16,9 @@ export function useIsAdmin() {
         role: string;
       };
       
-      // Define the return type explicitly for the RPC function
+      // Define both input and output types for the RPC function
       const { data, error } = await supabase
-        .rpc<boolean>('has_role', {
+        .rpc<HasRoleParams, boolean>('has_role', {
           user_id: user.id,
           role: 'admin'
         });
