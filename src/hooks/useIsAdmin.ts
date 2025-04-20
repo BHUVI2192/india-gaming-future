@@ -11,14 +11,15 @@ export function useIsAdmin() {
     queryFn: async () => {
       if (!user) return false;
       
-      type HasRoleParams = {
+      // Define the parameters interface
+      interface HasRoleParams {
         user_id: string;
         role: string;
-      };
+      }
       
-      // Define both input and output types for the RPC function
+      // Fix the RPC call typing by specifying the correct generic types
       const { data, error } = await supabase
-        .rpc<HasRoleParams, boolean>('has_role', {
+        .rpc<boolean>('has_role', {
           user_id: user.id,
           role: 'admin'
         });
